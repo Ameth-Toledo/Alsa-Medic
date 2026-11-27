@@ -1,19 +1,27 @@
 ---
+import { Font } from 'astro:assets';
+
+import '../styles/global.css';
+import AnimatedSidebarPreview from '../shared/components/ui/demo';
 ---
 
-<html lang="en">
+<html lang="es" class="dark">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" href="assets/logo.png" />
+		<link rel="icon" href="/assets/logo.png" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
+		<script is:inline>
+			const storedTheme = localStorage.getItem("theme");
+			document.documentElement.classList.toggle(
+				"dark",
+				storedTheme !== "light",
+			);
+		</script>
+		<Font cssVariable="--font-poppins" preload />
 		<title>Alsa Medic</title>
 	</head>
 	<body>
-		<h1>Alsa Medic</h1>
-		<img src="assets/logo.png" alt="Alsa Medic Logo" style="width: 100px; height: auto;" />
-		<p>Welcome to Alsa Medic, your trusted source for medical information and services.</p>
-		<p>Explore our website to learn more about our offerings and how we can assist you in your healthcare journey.</p>
-		<p>Contact us for any inquiries or support.</p>
+		<AnimatedSidebarPreview client:load />
 	</body>
 </html>
