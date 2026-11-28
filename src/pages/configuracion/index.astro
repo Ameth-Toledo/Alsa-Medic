@@ -1,0 +1,12 @@
+---
+import SettingsView from '../../features/settings/presentation/views/settings-view';
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+---
+
+<DashboardLayout
+	title="Configuración · Alsa Medic"
+	activeHref="/configuracion"
+	headerLabel="Configuración"
+>
+	<SettingsView client:load />
+</DashboardLayout>

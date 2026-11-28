@@ -1,0 +1,45 @@
+---
+import { Font } from 'astro:assets';
+
+import DashboardShell from '../shared/components/ui/dashboard-shell';
+import RouterOutlet from '../shared/components/RouterOutlet.astro';
+import '../shared/styles/global.css';
+
+interface Props {
+	title?: string;
+	activeHref?: string;
+	headerLabel?: string;
+}
+
+const {
+	title = 'Alsa Medic',
+	activeHref = Astro.url.pathname,
+	headerLabel,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="es" class="dark">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="/assets/logo.png" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<script is:inline>
+			const storedTheme = localStorage.getItem("theme");
+			document.documentElement.classList.toggle(
+				"dark",
+				storedTheme !== "light",
+			);
+		</script>
+		<Font cssVariable="--font-poppins" preload />
+		<title>{title}</title>
+	</head>
+	<body>
+		<DashboardShell client:load activeHref={activeHref} headerLabel={headerLabel}>
+			<RouterOutlet class="p-5 sm:p-7">
+				<slot />
+			</RouterOutlet>
+		</DashboardShell>
+	</body>
+</html>
