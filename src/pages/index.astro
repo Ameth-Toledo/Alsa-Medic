@@ -1,27 +1,8 @@
 ---
-import { Font } from 'astro:assets';
-
-import '../styles/global.css';
-import AnimatedSidebarPreview from '../shared/components/ui/demo';
+import OverviewView from '../features/dashboard/presentation/views/overview-view';
+import DashboardLayout from '../layouts/DashboardLayout.astro';
 ---
 
-<html lang="es" class="dark">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" href="/assets/logo.png" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<script is:inline>
-			const storedTheme = localStorage.getItem("theme");
-			document.documentElement.classList.toggle(
-				"dark",
-				storedTheme !== "light",
-			);
-		</script>
-		<Font cssVariable="--font-poppins" preload />
-		<title>Alsa Medic</title>
-	</head>
-	<body>
-		<AnimatedSidebarPreview client:load />
-	</body>
-</html>
+<DashboardLayout title="Dashboard · Alsa Medic" activeHref="/dashboard">
+	<OverviewView client:load />
+</DashboardLayout>

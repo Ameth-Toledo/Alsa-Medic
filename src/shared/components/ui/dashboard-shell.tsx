@@ -1,5 +1,9 @@
 "use client";
 
+import { Bell, Moon, PanelLeft, Settings, Sun, X } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { getNavigationItemsForReact } from "@/shared/navigation/presentation/viewmodels/use-navigation-react";
+import NotificationsPanel from "@/shared/notifications/presentation/components/notifications-panel";
 import {
 	AnimatedSidebar,
 	AnimatedSidebarClose,
@@ -17,21 +21,43 @@ import {
 	AnimatedSidebarRail,
 	AnimatedSidebarTrigger,
 } from "./animated-sidebar";
-import { Moon, PanelLeft, Settings, Sun, X } from "lucide-react";
-import { useEffect, useState } from "react";
-import { getNavigationItemsForReact } from "@/shared/navigation/presentation/viewmodels/use-navigation-react";
 
 const navigation = getNavigationItemsForReact();
 
-export default function AnimatedSidebarPreview() {
-	const [active, setActive] = useState(navigation[0]?.label ?? "");
+export interface DashboardShellProps {
+	activeHref?: string;
+	headerLabel?: string;
+	children?: ReactNode;
+}
+
+export default function DashboardShell({
+	activeHref = "/dashboard",
+	headerLabel,
+	children,
+}: DashboardShellProps) {
 	const [theme, setTheme] = useState<"dark" | "light">("dark");
+	const [notificationsOpen, setNotificationsOpen] = useState(false);
+	const activeLabel =
+		headerLabel ??
+		navigation.find((item) => item.href === activeHref)?.label ??
+		"Dashboard";
 
 	useEffect(() => {
 		setTheme(
 			document.documentElement.classList.contains("dark") ? "dark" : "light",
 		);
 	}, []);
+
+	useEffect(() => {
+		if (!notificationsOpen) return;
+
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.key === "Escape") setNotificationsOpen(false);
+		};
+
+		window.addEventListener("keydown", handleKeyDown);
+		return () => window.removeEventListener("keydown", handleKeyDown);
+	}, [notificationsOpen]);
 
 	const toggleTheme = () => {
 		const next = theme === "dark" ? "light" : "dark";
@@ -69,12 +95,12 @@ export default function AnimatedSidebarPreview() {
 						<AnimatedSidebarGroupLabel>Menú</AnimatedSidebarGroupLabel>
 						<AnimatedSidebarGroupContent>
 							<AnimatedSidebarMenu>
-								{navigation.map(({ label, Icon }) => (
+								{navigation.map(({ href, label, Icon }) => (
 									<AnimatedSidebarMenuItem key={label}>
 										<AnimatedSidebarMenuButton
-											isActive={active === label}
+											href={href}
+											isActive={activeHref === href}
 											icon={<Icon className="size-4" />}
-											onSelect={() => setActive(label)}
 										>
 											{label}
 										</AnimatedSidebarMenuButton>
@@ -90,7 +116,10 @@ export default function AnimatedSidebarPreview() {
 						type="button"
 						className="flex min-h-11 w-full items-center gap-3 overflow-hidden rounded-xl p-1 text-left outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
 					>
-						<span className="grid size-9 shrink-0 place-items-center rounded-full text-xs font-semibold text-black" style={{ backgroundColor: "#D5FF66" }}>
+						<span
+							className="grid size-9 shrink-0 place-items-center rounded-full text-xs font-semibold text-black"
+							style={{ backgroundColor: "#D5FF66" }}
+						>
 							AM
 						</span>
 						<span className="min-w-0 flex-1 group-data-[state=collapsed]/sidebar:hidden">
@@ -113,16 +142,27 @@ export default function AnimatedSidebarPreview() {
 						<PanelLeft aria-hidden="true" className="size-4" />
 					</AnimatedSidebarTrigger>
 					<div className="h-5 w-px bg-border" />
-					<p className="text-sm font-medium text-foreground">{active}</p>
+					<p className="text-sm font-medium text-foreground">{activeLabel}</p>
 					<div className="ml-auto flex items-center gap-1">
 						<button
 							type="button"
+							onClick={() => setNotificationsOpen((open) => !open)}
+							aria-label="Notificaciones"
+							aria-expanded={notificationsOpen}
+							aria-controls="notifications-panel"
+							title="Notificaciones"
+							className="inline-flex size-9 items-center justify-center rounded-lg text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+						>
+							<Bell aria-hidden="true" className="size-4" />
+						</button>
+						<a
+							href="/configuracion"
 							aria-label="Configuración"
 							title="Configuración"
 							className="inline-flex size-9 items-center justify-center rounded-lg text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
 						>
 							<Settings aria-hidden="true" className="size-4" />
-						</button>
+						</a>
 						<button
 							type="button"
 							onClick={toggleTheme}
@@ -147,34 +187,13 @@ export default function AnimatedSidebarPreview() {
 					</div>
 				</header>
 
-				<div className="flex min-h-0 flex-1 flex-col justify-between overflow-hidden p-5 sm:p-7">
-					<div>
-						<p className="text-xs font-medium text-muted-foreground">
-							Alsa Medic
-						</p>
-						<h1 className="mt-2 max-w-md text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
-							Welcome to Alsa Medic
-						</h1>
-						<p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-							Your trusted source for medical information and services.
-						</p>
-					</div>
-
-					<div className="flex items-end justify-between border-border border-t pt-4">
-						<div>
-							<p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-								Active view
-							</p>
-							<p className="mt-1 text-sm font-medium text-foreground">
-								{active}
-							</p>
-						</div>
-						<p className="hidden text-xs text-muted-foreground sm:block">
-							Press ⌘B to toggle
-						</p>
-					</div>
-				</div>
+				<div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
 			</AnimatedSidebarInset>
+
+			<NotificationsPanel
+				open={notificationsOpen}
+				onClose={() => setNotificationsOpen(false)}
+			/>
 		</AnimatedSidebarProvider>
 	);
 }

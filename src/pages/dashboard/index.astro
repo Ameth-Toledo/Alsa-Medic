@@ -1,0 +1,8 @@
+---
+import OverviewView from '../../features/dashboard/presentation/views/overview-view';
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+---
+
+<DashboardLayout title="Dashboard · Alsa Medic" activeHref="/dashboard">
+	<OverviewView client:load />
+</DashboardLayout>

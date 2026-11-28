@@ -1,8 +1,8 @@
-import { navigationRepository } from '../../di/navigation-repository';
+import { getNavigationItemsUseCase } from '../../di/navigation-use-cases';
 import { navigationIconsReact } from '../navigation-icons-react';
 
 export function getNavigationItemsForReact() {
-	return navigationRepository.getItems().map((item) => ({
+	return getNavigationItemsUseCase.execute().map((item) => ({
 		...item,
 		Icon: navigationIconsReact[item.icon],
 	}));
