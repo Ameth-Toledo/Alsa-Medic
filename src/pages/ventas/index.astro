@@ -1,0 +1,12 @@
+---
+import SalesView from '../../features/sales/presentation/views/sales-view';
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+---
+
+<DashboardLayout
+	title="Ventas · Alsa Medic"
+	activeHref="/ventas"
+	headerLabel="Ventas"
+>
+	<SalesView client:load />
+</DashboardLayout>
